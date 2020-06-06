@@ -3,6 +3,8 @@ import net.proteanit.sql.DbUtils;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 
 public class Main {
@@ -37,7 +39,7 @@ public class Main {
 
         //combobox do wybrania tabeli
         ResultSet rs = null;
-        JComboBox jComboBox1 = new JComboBox();
+        final JComboBox jComboBox1 = new JComboBox();
         try {
             DatabaseMetaData meta = c.getMetaData();
             rs = meta.getTables(null, null, null, new String[]{"TABLE"});
@@ -57,7 +59,7 @@ public class Main {
         JOptionPane.showMessageDialog(null,"Polaczono z baza");
 
         //tworzenie tabeli
-        JTable table = new JTable();
+        final JTable table = new JTable();
         JScrollPane scrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
         f.getContentPane().add(BorderLayout.CENTER, table);
@@ -68,44 +70,50 @@ public class Main {
 
 
         //testowy fragment, który powinien wyświetlać tabele, ale odpala sie tylko raz na starcie, wiec wrzuca 1 tabele. trzeba zrobic jakos, zeby sie odpalał przy kazdej zmianie
+            //ten fragment opisany u góry jest wrzucony w blok, który nasłuchuje zmiany w tym rozwijanym kwadraciku.
+        final Connection finalC = c;
+        jComboBox1.addActionListener (new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Statement stmt1 = finalC.createStatement();
+                    ResultSet rs1 = stmt1.executeQuery("SELECT * FROM [" + jComboBox1.getSelectedItem() + "];");
 
-        try {
-            Statement stmt1 = c.createStatement();
-            ResultSet rs1 = stmt1.executeQuery("SELECT * FROM [" + jComboBox1.getSelectedItem() + "];");
+                    // get columns info
+                    ResultSetMetaData rsmd = rs1.getMetaData();
+                    int columnCount = rsmd.getColumnCount();
 
-            // get columns info
-            ResultSetMetaData rsmd = rs1.getMetaData();
-            int columnCount = rsmd.getColumnCount();
+                    // for changing column and row model
+                    DefaultTableModel tm = (DefaultTableModel) table.getModel();
 
-            // for changing column and row model
-            DefaultTableModel tm = (DefaultTableModel) table.getModel();
+                    // clear existing columns
+                    tm.setColumnCount(0);
 
-            // clear existing columns
-            tm.setColumnCount(0);
+                    // add specified columns to table
+                    for (int i = 1; i <= columnCount; i++ ) {
+                        tm.addColumn(rsmd.getColumnName(i));
+                    }
 
-            // add specified columns to table
-            for (int i = 1; i <= columnCount; i++ ) {
-                tm.addColumn(rsmd.getColumnName(i));
-            }
+                    // clear existing rows
+                    tm.setRowCount(0);
 
-            // clear existing rows
-            tm.setRowCount(0);
+                    // add rows to table
+                    while (rs1.next()) {
+                        String[] a = new String[columnCount];
+                        for(int i = 0; i < columnCount; i++) {
+                            a[i] = rs1.getString(i+1);
+                        }
+                        tm.addRow(a);
+                    }
+                    tm.fireTableDataChanged();
 
-            // add rows to table
-            while (rs1.next()) {
-                String[] a = new String[columnCount];
-                for(int i = 0; i < columnCount; i++) {
-                    a[i] = rs1.getString(i+1);
+                    rs1.close();
+                    stmt1.close();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null,ex);
                 }
-                tm.addRow(a);
             }
-            tm.fireTableDataChanged();
+        });
 
-            rs1.close();
-            stmt1.close();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null,ex);
-        }
 
         //dalej jest git
 
@@ -122,9 +130,9 @@ public class Main {
 
 
 
-    public static void updateTable() {
+ /*       public static void updateTable() {
 
-/*        PreparedStatement pst = null;
+    PreparedStatement pst = null;
         ResultSet rs = null;
         Connection c = null;
         connecttoDB();
@@ -135,7 +143,7 @@ public class Main {
             table.setModel(DbUtils.resultSetToTableModel(rs));
         } catch (Exception e){
             JOptionPane.showMessageDialog(null,e);
-        }*/
-    }
+        }
+  */  }
 
-}
+
