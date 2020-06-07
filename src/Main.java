@@ -80,9 +80,26 @@ public class Main {
 
 
 
-        // TODO: zmienić, żeby czytało za każdym razem jak się zmieni tabelę. Można w teorii wrzucić w pętlę od słuchania boxa 1
-        final JComboBox jComboBox2 = new JComboBox();
+        // Przycisk usuwajacyt selected wiersz poczatek
 
+        JButton jbDEL = new JButton("USUN");
+        final DefaultTableModel tmDEL = (DefaultTableModel) table.getModel();
+        jbDEL.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                // check for selected row first
+                if(table.getSelectedRow() != -1) {
+                    // remove selected row from the model
+                    tmDEL.removeRow(table.getSelectedRow());
+                    JOptionPane.showMessageDialog(null, "Selected row deleted successfully");
+                }
+            }
+        });
+
+        jp2.add(jbDEL);
+        /////////////////przycisk usuwający koniec
+
+        final JComboBox jComboBox2 = new JComboBox();
 
         jp2.add(jl2);
         jp2.add(jComboBox2);
@@ -203,7 +220,6 @@ public class Main {
                 }
             });
             /////////////Koniec tego fragmentu.
-
     }
  };
 ;
