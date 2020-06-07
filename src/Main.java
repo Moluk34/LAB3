@@ -82,16 +82,14 @@ public class Main {
 
         // Przycisk usuwajacyt selected wiersz poczatek
 
-        JButton jbDEL = new JButton("USUN");
+        JButton jbDEL = new JButton("USUN"); //tworzymy przycisk
         final DefaultTableModel tmDEL = (DefaultTableModel) table.getModel();
         jbDEL.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                // check for selected row first
-                if(table.getSelectedRow() != -1) {
-                    // remove selected row from the model
-                    tmDEL.removeRow(table.getSelectedRow());
-                    JOptionPane.showMessageDialog(null, "Selected row deleted successfully");
+
+            public void actionPerformed(ActionEvent ae) { //jak klikniemy przycisk
+                if(table.getSelectedRow() != -1) { //jak jest jakis zaznaczony
+                    tmDEL.removeRow(table.getSelectedRow()); //usuwa rekord
+                    JOptionPane.showMessageDialog(null, "Rekord usuniety");
                 }
             }
         });
